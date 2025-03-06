@@ -1,22 +1,17 @@
-class TileSelector{
+class TileSelector extends GameObject{
     constructor(config){
-        this.x = config.x;
-        this.y = config.y;
-        this.enabled = 1;
+        super(config);
+        this.enabled = 0;
         this.selectedObj = null;
         this.selectedTile = [];
     }
 
-    drawSelector(ctx, x, y){
+    //TODO give sprite
+    draw(ctx, x, y){
         ctx.lineWidth = "4";
         ctx.strokeStyle = "#C41E3A";
         ctx.rect(this.x, this.y, 100, 100);
         ctx.stroke();
-    }
-
-    move(x, y){
-        this.x = x;
-        this.y = y;
     }
 
     disableSelector(){
@@ -30,8 +25,20 @@ class TileSelector{
         this.selectedTile = tile
     }
 
-    disselectObj(){
+    deselectObj(){
         this.enabled = 0;
         this.selectedObj = null;
+    }
+
+    isEmpty(){
+        if(this.selectedObj == null) { return true; }
+        return false;
+    }
+
+    compare(obj){
+        if(this.selectedObj != obj && obj != null){
+            return false;
+        }
+        return true;
     }
 }

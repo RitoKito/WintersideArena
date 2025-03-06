@@ -4,25 +4,34 @@ class Arena {
         this.canvas = this.element.querySelector(".game-canvas");
         this.ctx = this.canvas.getContext("2d");
         this.map = null;
-        this.tileSelector = new TileSelector({x: 0, y: 0});
+        this.tileSelector = null;
+        // TODO create game state manager
     }
 
     startGameLoop() {
         const step = () => {
+            console.log("Game is running");
 
-            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height); // clean canvas
+            //Clean canvas per step
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
             this.ctx.beginPath();
-            console.log("game is running");
             this.map.drawTileSheet(this.ctx);
-            
-            Object.values(this.map.gameObjects).forEach(objects => {
-                objects.sprite.draw(this.ctx);
-            })    
 
+            if(this.map.validTilesEnabled == 1){
+                this.map.drawValidTiles(this.ctx);
+            }
+            
+            // Render gameobjects
+            Object.values(this.map.gameObjects).forEach(object => {
+                object.sprite.draw(this.ctx);
+            })
+
+            // Render tileSelector
             if(this.tileSelector.enabled == 1){
-                this.tileSelector.drawSelector(this.ctx);
+                this.tileSelector.draw(this.ctx);
             }
 
+            // Game loop at 60FPS
             requestAnimationFrame(() => {
                 step();
             })
@@ -33,115 +42,76 @@ class Arena {
 
     init() {
         console.log("Arena init", this);
-        this.canvas.addEventListener("click", function(event){
+        this.canvas.addEventListener("click", function(event){ // TODO refactor into functions
 
+            // Map screen coordinates to tiles
+            // x and y are flipped to map array indices to intiuitive 2D axis
             let x = Math.trunc(event.offsetY/100);
             let y = Math.trunc(event.offsetX/100);
-            console.log("Click on: " + x + ":" + y);
-            console.log(this.map.tileObjs[x][y].occupied);
+            // console.log(this.map.isValidTile([x,y]));
 
-            if(this.tileSelector.selectedObj == null){
-                if(this.map.tileObjs[x][y].occupied == 1 && this.tileSelector.selectedObject == null){
-                    this.tileSelector.move(y*100, x*100);
+            // Select a tile occupied by playable character or switch to different tile
+            if(this.tileSelector.isEmpty() || !this.tileSelector.compare(this.map.tileObjs[x][y].occupant)){
+                if(this.map.isOccupied([x, y])){
+
+                    this.tileSelector.tileMove([x, y]);
+                    this.tileSelector.enabled = 1;
                     this.tileSelector.selectObj(this.map.tileObjs[x][y].occupant, [x, y]);
+
+                    let char = this.tileSelector.selectedObj;
+
+                    this.map.validTiles = new Set();
+                    this.map.getValidTiles(char.tile[1] + 1, char.tile[0], char.stats.moveLen);
+                    this.map.getValidTiles(char.tile[1] - 1, char.tile[0], char.stats.moveLen);
+                    this.map.getValidTiles(char.tile[1], char.tile[0] + 1, char.stats.moveLen);
+                    this.map.getValidTiles(char.tile[1], char.tile[0] - 1, char.stats.moveLen);
+                    this.map.validTilesEnabled = 1;
+
                 }
             }
+            // Move character or deselect by clicking on non-tranversable tile
             else{
-                if(this.tileSelector.enabled == 1 && this.tileSelector.selectedObj != null){
-                    if(this.map.tileObjs[x][y].traversable == 0 && this.map.tileObjs[x][y].occupied == 0){
-                        this.freeTile(this.tileSelector.selectedTile);
-                        this.occupyTile([x, y], this.tileSelector.selectedObj);
+                if(this.map.isTraversable([x,y]) && !this.map.isOccupied([x,y]) && this.map.isValidTile(x, y)){
+                        this.map.freeTile(this.tileSelector.selectedTile);
+                        this.map.occupyTile([x, y], this.tileSelector.selectedObj);
 
-                        this.tileSelector.selectedObj.move([x,y]);
-                        this.tileSelector.disselectObj();
-                    }
-                    else{
-                        this.tileSelector.disselectObj();
-                    }
+                        this.tileSelector.selectedObj.tileMove([x,y]);
                 }
+                this.tileSelector.deselectObj();
+                this.tileSelector.enabled = 0;
+                this.map.validTilesEnabled = 0;
             }
 
         }.bind(this));
 
-        this.map = new ArenaMap(window.MapList.Demo);
+        // Initialize map
+        this.map = new MapManager(window.MapList.Demo);
+        this.tileSelector = new TileSelector({x: 0, y: 0});
         this.startGameLoop();
 
-        // this.map.gameObjects = Object.assign({char: 
-        //     new GameObject({
-        //         tile: [0, 0]
-        //     })
-        // }, this.map.gameObjects);
 
-        // this.instantiateObject(0, 0);
+        // instantiate test character
+        instPlayableChar(
+            "char0", 
+            {moveLen: 3}, 
+            [0,0], 
+            this.map, 
+            "img/Paladin_sketch_100.png");
 
-        Object.values(this.map.gameObjects).forEach(obj => {
-            this.occupyTile(obj.tile, obj);
-        })
+        instPlayableChar(
+            "char1", 
+            {moveLen: 3}, 
+            [0,1], 
+            this.map, 
+            "img/Paladin_sketch_100.png");
 
-    
-    }
-
-    // instantiateObject(tilePosX, tilePosY, name){
-    //     let newObj = new GameObject({
-    //         tile: [tilePosX, tilePosY]
-    //     })
-
-    //     this.map.gameObjects = {...this.map.gameObjects, char: new GameObject({name: [tilePosX, tilePosY]})};
-        
-
-    //     this.map.tileObjs[tilePosX][tilePosY].occupied = 1;
-    //     this.map.tileObjs[tilePosX][tilePosY].occupant = newObj
-    //     console.log(this.map.tileObjs);
-    // }
-
-    freeTile(tile){
-        this.map.tileObjs[tile[0]][tile[1]].occupant = null;
-        this.map.tileObjs[tile[0]][tile[1]].occupied = 0;
-    }
-    
-    occupyTile(tile, obj){
-        console.log(tile);
-        this.map.tileObjs[tile[0]][tile[1]].occupant = obj;
-        this.map.tileObjs[tile[0]][tile[1]].occupied = 1;
+        instPlayableChar(
+            "char2", 
+            {moveLen: 3}, 
+            [0,2], 
+            this.map, 
+            "img/Paladin_sketch_100.png");
+        // instPlayableChar("char1", [0,5], this.map.gameObjects, this.map);
+        // instPlayableChar("char5", [0,4], this.map.gameObjects, this.map);
     }
 }
-
-
-
-
-
-
-        /*
-        const image = new Image();
-        image.onload = () => {
-            this.ctx.drawImage(image, 0, 0)
-        };
-        image.src = "";
-        */
-
-        // Background placeholder
-        // this.ctx.fillStyle = "#DAF7A6";
-        // this.ctx.fillRect(0, 0, 600, 800);
-        // this.ctx.stroke();
-
-
-        // this.ctx.fillStyle = "#fff";
-        // let arenaTiles = [
-        //     [0, 0, 0, 1, 0, 0],
-        //     [0, 0, 0, 0, 0, 0],
-        //     [0, 1, 0, 0, 0, 0],
-        //     [0, 0, 0, 0, 1, 0],
-        //     [0, 0, 0, 0, 0, 0],
-        //     [0, 0, 1, 0, 1, 0],
-        //     [0, 0, 0, 0, 0, 0],
-        //     [1, 0, 0, 0, 0, 0]
-        // ];
-
-
-        // const char = new GameObject({
-        //     // x: convertTileToScreenPos([0,5])[0],
-        //     // y: convertTileToScreenPos([0,5])[1],
-        //     tile: [0, 0]
-        // })
-
-        // char.sprite.draw(this.ctx);

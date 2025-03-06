@@ -1,21 +1,23 @@
 class GameObject{
     constructor(config) {
-        this.tile = config.tile || [0, 0]
-        this.x = convertTileToScreenPos(config.tile)[0] || 0;
-        this.y = convertTileToScreenPos(config.tile)[1] || 0;
+        this.name = config.name;
+        this.x = config.x;
+        this.y = config.y;
         this.sprite = new Sprite({
             gameObject: this,
-            src: "" //config.src,
+            src: config.src,
         });
     }
 
-    move(newTile){
-        this.tile = newTile;
-        this.x = convertTileToScreenPos(this.tile)[0]
-        this.y = convertTileToScreenPos(this.tile)[1]
+    pixelMove(x, y){
+        this.x = x;
+        this.y = y;
+    }
+
+    tileMove(tile){
+        this.tile = tile;
+        this.x = tile[1]*100;
+        this.y = tile[0]*100;
     }
 }
 
-function convertTileToScreenPos(tile){
-    return [tile[0]*100 + 10, tile[1]*100 + 30]; // + object offset
-}
