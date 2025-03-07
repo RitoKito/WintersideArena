@@ -11,5 +11,13 @@ body {
     height: 800px;
     margin: 0 auto;
     margin-top: 20px;
-    outline: none
+    outline: none;
+    /* transform: scale(0.5); */
+}
+
+.ui-details {
+    position: relative;
+    width: 600px;
+    height: 100px;
+    background: rgb(255, 95, 95);
 }

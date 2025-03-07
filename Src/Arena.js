@@ -41,6 +41,17 @@ class Arena {
     }
 
     init() {
+        // const scale = (window.innerWidth/window.innerHeight)/(2560/1260);
+        const scaleX = window.innerWidth/2560
+        const scaleY = window.innerHeight/1260
+        // console.log(scaleX);
+        // console.log(window.innerHeight);
+        // console.log(document.querySelector(".game-container"));
+        // document.querySelector(".game-container").style.transform = "scale(" + scale + ")";
+        document.querySelector(".game-container").style.transform = "scaleX(" + scaleX + ")";
+        document.querySelector(".game-container").style.transform = "scaleY(" + scaleY + ")";
+        // transform: scale(0.5);
+
         console.log("Arena init", this);
         this.canvas.addEventListener("click", function(event){ // TODO refactor into functions
 
@@ -48,7 +59,7 @@ class Arena {
             // x and y are flipped to map array indices to intiuitive 2D axis
             let x = Math.trunc(event.offsetY/100);
             let y = Math.trunc(event.offsetX/100);
-            // console.log(this.map.isValidTile([x,y]));
+            console.log("Click on " + x +":"+y);
 
             // Select a tile occupied by playable character or switch to different tile
             if(this.tileSelector.isEmpty() || !this.tileSelector.compare(this.map.tileObjs[x][y].occupant)){
@@ -61,10 +72,10 @@ class Arena {
                     let char = this.tileSelector.selectedObj;
 
                     this.map.validTiles = new Set();
-                    this.map.getValidTiles(char.tile[1] + 1, char.tile[0], char.stats.moveLen);
-                    this.map.getValidTiles(char.tile[1] - 1, char.tile[0], char.stats.moveLen);
-                    this.map.getValidTiles(char.tile[1], char.tile[0] + 1, char.stats.moveLen);
-                    this.map.getValidTiles(char.tile[1], char.tile[0] - 1, char.stats.moveLen);
+                    this.map.calculateValidTiles(char.tile[1] + 1, char.tile[0], char.stats.moveLen);
+                    this.map.calculateValidTiles(char.tile[1] - 1, char.tile[0], char.stats.moveLen);
+                    this.map.calculateValidTiles(char.tile[1], char.tile[0] + 1, char.stats.moveLen);
+                    this.map.calculateValidTiles(char.tile[1], char.tile[0] - 1, char.stats.moveLen);
                     this.map.validTilesEnabled = 1;
 
                 }

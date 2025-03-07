@@ -59,23 +59,23 @@ class MapManager {
 
     //Recursive function to calculate possible tiles for movement
     //Based on char moveLen stat
-    getValidTiles(x, y , moveLen){
+    calculateValidTiles(x, y , moveLen){
         if(x < 0 || y < 0 || x >= this.tileObjs[0].length || y >= this.tileObjs.length) {
              return; 
         }
 
         let tile = this.tileObjs[y][x];
 
-        if(tile.traversable == 1 || tile.occupied || moveLen <= 0){
+        if(tile.traversable == 1 || tile.occupied == 1 || moveLen <= 0){
             return;
         }
 
         this.validTiles.add(this.tileObjs[y][x]);
 
-        this.getValidTiles(x + 1, y, moveLen - 1, this.validTiles);
-        this.getValidTiles(x - 1, y, moveLen - 1, this.validTiles);
-        this.getValidTiles(x, y + 1, moveLen - 1, this.validTiles);
-        this.getValidTiles(x, y - 1, moveLen - 1, this.validTiles);
+        this.calculateValidTiles(x + 1, y, moveLen - 1, this.validTiles);
+        this.calculateValidTiles(x - 1, y, moveLen - 1, this.validTiles);
+        this.calculateValidTiles(x, y + 1, moveLen - 1, this.validTiles);
+        this.calculateValidTiles(x, y - 1, moveLen - 1, this.validTiles);
     }
     
     isValidTile(x, y){
