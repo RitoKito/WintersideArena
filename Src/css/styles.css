@@ -13,7 +13,24 @@ body {
 }
 
 .ui-canvas {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr 2fr;
     background-color: blanchedalmond;
-    margin: 0 auto;
-    outline: none;
+    width: 600px;
+    height: 100px;
+}
+
+.player-unit-portrait {
+    margin: 5px;
+}
+
+.player-unit-stats{
+    display: grid;
+    grid-template-rows: 1fr 1fr 1fr;
+    margin: 5px;
+    vertical-align: middle;
+}
+
+.unit-stat{
+    font-size: 18px;
 }

@@ -3,8 +3,10 @@ class PlayableChar extends GameObject {
         super(config);
         this.tile = config.tile;
         this.stats = new CharStats({
-            moveLen: config.moveLen,
             maxHp: config.maxHp,
+            attack: config.attack,
+            moveLen: config.moveLen,
+            maxActions: config.maxActions
         });
         this.portrait = new Image();
         this.portrait.src = "./img/portrait_placeholder.png";
@@ -25,5 +27,9 @@ class PlayableChar extends GameObject {
         uiCtx.fillText("HP: " + this.stats.currentHP + "/" + this.stats.maxHp, 110, 30);
         uiCtx.fillText("OTHER STATS", 110, 60);
         uiCtx.fillText("OTHER STATS", 110, 90);
+    }
+
+    performAction(actions){
+        this.stats.currentActions -= actions;
     }
 }

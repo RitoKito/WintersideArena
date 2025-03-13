@@ -130,9 +130,11 @@ class MapManager {
     }
 
     drawValidTiles(ctx){
+        ctx.globalAlpha=0.75;
         this.validTiles.forEach(tile => {
             tile.drawValid(ctx)
         })
+        ctx.globalAlpha=1;
     }
 
     freeTile(tile){

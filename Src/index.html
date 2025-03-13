@@ -8,7 +8,19 @@
 </head>
 <body>
     <div class="game-container">
-        <canvas class="ui-canvas" width="600" height="100"></canvas>
+        <!-- <canvas class="ui-canvas" width="600" height="100"></canvas> -->
+         <div class="ui-canvas">
+            <img class="player-unit-portrait" width="90" height="90"/>
+            <div class="player-unit-stats">
+                <div class="unit-stat player-unit-hp">MISSING HP</div>
+                <div class="unit-stat player-unit-attack">MISSING ATTACK</div>
+                <div class="unit-stat player-unit-speed">MISSING SPEED</div>
+                <div class="unit-stat player-unit-actions">MISSING ACTIONS</div>
+            </div>
+            <!-- <img class="player_portrait"/> -->
+            <!-- <div class="player_stats"></div> -->
+            <!-- <div class="item4">4</div> -->
+         </div>
         <canvas class="game-canvas" width="600"  height="900"></canvas>
     </div>
 
@@ -22,6 +34,7 @@
     <script src="TileSelector.js"></script>
     <script src="ObjectManager.js"></script>
     <script src="CharStats.js"></script>
+    <script src="UIManager.js"></script>
     <script src="init.js"></script>
 </body>
 </html>

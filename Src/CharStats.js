@@ -1,14 +1,13 @@
 class CharStats {
     constructor(config){
-        // this.hp = config.hp;
         // this.shield = config.shield;
-        this.moveLen = config.moveLen;
         this.maxHp = config.maxHp;
-        this.currentHP = this.maxHp;
-        // this.currentHp = this.maxHp;
+        this.currentHp = this.maxHp;
+        this.attack = config.attack;
+        this.moveLen = config.moveLen;
+        this.maxActions = config.maxActions;
+        this.currentActions = this.maxActions;
         // this.grenade = config.grenade;
         // this.ability = config.ability;
-
-        console.log(this.maxHp);
     }
 }
