@@ -27,7 +27,7 @@ class Sprite{
         const y = this.gameObject.y;
         ctx.drawImage(this.image,
             0, 0,
-            100, 100,
+            this.image.width, this.image.height,
             x, y,
             100, 100
         )

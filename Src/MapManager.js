@@ -6,6 +6,8 @@ class MapManager {
         this.initTileObjs();
         this.validTilesEnabled = 0;
         this.validTiles = new Set();
+        // this.image = new Image();
+        // this.image.src = "./img/SS1_Sketch.png"
         
         // this.lowerImage = new Image();
         // this.lowerImage.src = config.lowerSrc;
@@ -17,6 +19,42 @@ class MapManager {
     initTileObjs() {
         for(let i = 0; i < this.layout.length; i++){
             for(let j = 0; j < this.layout[i].length; j++){
+
+                //TODO automated tile img 
+                let tileImg = "./img/tileset/";
+
+                switch(window.MapList.Demo.tileSprite[i][j]){
+                    case 0:
+                        tileImg += "NN_MM.png";
+                        break;
+                    case 1:
+                        tileImg += "NN_TL.png";
+                        break;
+                    case 2:
+                        tileImg += "NN_TR.png";
+                        break;
+                    case 3:
+                        tileImg += "NN_BL.png";
+                        break;    
+                    case 4:
+                        tileImg += "NN_BR.png";
+                        break;    
+                    case 5:
+                        tileImg += "NN_ML.png";
+                        break;
+                    case 6:
+                        tileImg += "NN_MR.png";
+                        break;
+                    case 7:
+                        tileImg += "NN_TM.png";
+                        break;    
+                    case 8:
+                        tileImg += "NN_BM.png";
+                        break;    
+                    case 9:
+                        tileImg += "NN_wall.png";
+                        break;
+                };
                 
                 let traversable = 1;
                 if(this.layout[i][j] == 0) { traversable = 0; }
@@ -28,7 +66,8 @@ class MapManager {
                     tilePos: [i,j],
                     traversable: traversable,
                     occupied: 0,
-                    occupant: null
+                    occupant: null,
+                    src: tileImg
                 });
             }
         }
@@ -47,14 +86,18 @@ class MapManager {
     drawTileSheet(ctx){ // for testing purposes TODO: proper tilesheet
         this.tileObjs.forEach(row => {
             row.forEach(tile =>{
-                if(tile.traversable == 0) { ctx.fillStyle = "#a6a8f7"; }
-                else if(tile.traversable == 1) { ctx.fillStyle = "black"; }
-
-                ctx.fillRect(tile.x, tile.y, 100, 100);
-                ctx.stroke();
+                tile.sprite.draw(ctx)
             })
-
         });
+
+        // const x = this.gameObject.x;
+        // const y = this.gameObject.y;
+        // ctx.drawImage(this.image,
+        //     0, 0,
+        //     this.image.width, this.image.height,
+        //     0, 0,
+        //     700, 800
+        // )
     }
 
     //Recursive function to calculate possible tiles for movement
@@ -86,13 +129,9 @@ class MapManager {
         return false;
     }
 
-    //TODO give sprite
     drawValidTiles(ctx){
         this.validTiles.forEach(tile => {
-            ctx.lineWidth = "4";
-            // ctx.strokeStyle = "#C41E3A"
-            ctx.rect(tile.tilePos[1]*100, tile.tilePos[0]*100, 100, 100);
-            ctx.stroke();
+            tile.drawValid(ctx)
         })
     }
 
@@ -132,24 +171,34 @@ class MapManager {
 window.MapList = {
     Demo: {
         layout: [
-            [0, 0, 0, 1, 1, 0],
-            [0, 1, 0, 0, 0, 0],
-            [0, 0, 0, 1, 1, 0],
-            [1, 0, 0, 0, 1, 0],
-            [1, 0, 1, 0, 0, 0],
-            [0, 0, 1, 1, 0, 0],
-            [0, 1, 0, 0, 0, 1],
-            [0, 0, 0, 0, 1, 1]
+            [0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 1, 0],
+            [0, 0, 0, 0, 0, 0],
+            [0, 1, 1, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0],
+            [0, 1, 0, 0, 1, 0],
+            [0, 0, 1, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0],
+        ],
+        tileSprite: [
+            [1, 7, 7, 7, 7, 2],
+            [5, 0, 0, 0, 9, 6],
+            [5, 0, 0, 0, 0, 6],
+            [5, 9, 9, 0, 0, 6],
+            [5, 0, 0, 0, 0, 6],
+            [5, 9, 0, 0, 9, 6],
+            [5, 0, 9, 0, 0, 6],
+            [3, 8, 8, 8, 8, 4],
         ],
         tileObjs: [
-            [0, 0, 0, 1, 0, 0],
-            [0, 0, 0, 0, 0, 0],
             [0, 1, 0, 1, 0, 0],
             [0, 0, 0, 0, 1, 0],
             [0, 0, 0, 0, 0, 0],
-            [0, 0, 1, 0, 1, 0],
-            [0, 0, 0, 0, 0, 0],
-            [1, 0, 0, 0, 0, 0]
+            [0, 1, 1, 0, 0, 0],
+            [0, 0, 0, 0, 1, 0],
+            [0, 1, 0, 0, 1, 0],
+            [0, 0, 1, 0, 0, 0],
+            [0, 0, 1, 0, 0, 0],
         ],
     }
 }

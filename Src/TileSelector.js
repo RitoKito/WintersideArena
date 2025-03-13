@@ -4,14 +4,23 @@ class TileSelector extends GameObject{
         this.enabled = 0;
         this.selectedObj = null;
         this.selectedTile = [];
+        this.selectedImg = new Image();
+        this.selectedImg.src = "./img/selected_tile.png";
     }
 
     //TODO give sprite
     draw(ctx, x, y){
-        ctx.lineWidth = "4";
-        ctx.strokeStyle = "#C41E3A";
-        ctx.rect(this.x, this.y, 100, 100);
-        ctx.stroke();
+        // ctx.lineWidth = "4";
+        // ctx.strokeStyle = "#C41E3A";
+        // ctx.rect(this.x, this.y, 100, 100);
+        // ctx.stroke();
+
+        ctx.drawImage(this.selectedImg,
+            0, 0,
+            this.selectedImg.width, this.selectedImg.height,
+            this.x, this.y,
+            100, 100
+        );
     }
 
     disableSelector(){

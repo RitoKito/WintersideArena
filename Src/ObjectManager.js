@@ -7,6 +7,7 @@ function instPlayableChar(name, stats, tile, mapManager, imgPath){
     let character = new PlayableChar({
         name: name,
         moveLen: stats.moveLen,
+        maxHp: stats.maxHp,
         x: tile[1]*100,
         y: tile[0]*100,
         tile: tile,

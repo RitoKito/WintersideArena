@@ -1,8 +1,13 @@
 class Arena {
     constructor(config) {
         this.element = config.element;
+
         this.canvas = this.element.querySelector(".game-canvas");
         this.ctx = this.canvas.getContext("2d");
+
+        this.uiCanvas = this.element.querySelector(".ui-canvas");
+        this.uiCtx = this.uiCanvas.getContext("2d");
+
         this.map = null;
         this.tileSelector = null;
         // TODO create game state manager
@@ -12,24 +17,32 @@ class Arena {
         const step = () => {
             console.log("Game is running");
 
-            //Clean canvas per step
+            //Clean map canvas per step
             this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
             this.ctx.beginPath();
+
+
+            //Clean UI canvas
+            this.uiCtx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            this.uiCtx.beginPath();
+
             this.map.drawTileSheet(this.ctx);
 
             if(this.map.validTilesEnabled == 1){
                 this.map.drawValidTiles(this.ctx);
             }
-            
-            // Render gameobjects
-            Object.values(this.map.gameObjects).forEach(object => {
-                object.sprite.draw(this.ctx);
-            })
 
             // Render tileSelector
             if(this.tileSelector.enabled == 1){
                 this.tileSelector.draw(this.ctx);
+                this.tileSelector.selectedObj.drawPortrait(this.uiCtx);
+                this.tileSelector.selectedObj.drawStats(this.uiCtx);
             }
+
+            // Render gameobjects, drawn last to be on top layer
+            Object.values(this.map.gameObjects).forEach(object => {
+                object.sprite.draw(this.ctx);
+            })
 
             // Game loop at 60FPS
             requestAnimationFrame(() => {
@@ -93,24 +106,29 @@ class Arena {
         // instantiate test character
         instPlayableChar(
             "char0", 
-            {moveLen: 3}, 
-            [0,0], 
+            {
+                moveLen: 3,
+                maxHp: 12
+            },
+            [1,0], 
             this.map, 
             "img/Paladin_sketch_100.png");
 
-        instPlayableChar(
-            "char1", 
-            {moveLen: 3}, 
-            [0,1], 
-            this.map, 
-            "img/Paladin_sketch_100.png");
+        // instPlayableChar(
+        //     "char1", 
+        //     {moveLen: 3,
+        //      hp: 12,
+        //     }, 
+        //     [1,4],
+        //     this.map, 
+        //     "img/Paladin_sketch_100.png");
 
-        instPlayableChar(
-            "char2", 
-            {moveLen: 3}, 
-            [0,2], 
-            this.map, 
-            "img/Paladin_sketch_100.png");
+        // instPlayableChar(
+        //     "char2", 
+        //     {moveLen: 3}, 
+        //     [1,2], 
+        //     this.map, 
+        //     "img/Paladin_sketch_100.png");
         // instPlayableChar("char1", [0,5], this.map.gameObjects, this.map);
         // instPlayableChar("char5", [0,4], this.map.gameObjects, this.map);
     }
