@@ -1,4 +1,4 @@
-function instPlayableChar(name, stats, tile, mapManager, imgPath){
+function instPlayableUnit(name, stats, tile, mapManager, imgPath){
     if(mapManager.isOccupied(tile) || !mapManager.isTraversable(tile)){
         console.log("Failed to instantiate " + name + " at " + tile + "; Aborting");
         return;

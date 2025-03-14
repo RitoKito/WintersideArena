@@ -5,6 +5,7 @@ class TileSelector extends GameObject{
         this.selectedObj = null;
         // Currently selected tile position
         this.selectedTile = [];
+        this.confirmationTile = [];
         this.selectedImg = new Image();
         this.selectedImg.src = "./img/selected_tile.png";
     }
@@ -52,5 +53,11 @@ class TileSelector extends GameObject{
             return false;
         }
         return true;
+    }
+
+    disable(){
+        this.enabled = 0;
+        this.selectedTile = [];
+        this.confirmationTile = [];
     }
 }

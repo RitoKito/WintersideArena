@@ -81,8 +81,6 @@ class MapManager {
     //     ctx.drawImage(this.upperImage, 0, 0);
     // }
 
-
-
     drawTileSheet(ctx){ // for testing purposes TODO: proper tilesheet
         this.tileObjs.forEach(row => {
             row.forEach(tile =>{
@@ -143,7 +141,6 @@ class MapManager {
     }
     
     occupyTile(tile, obj){
-        // console.log(tile);
         if(this.isOccupied(tile)){
             console.log("Error: tile at " + tile + " already occupied");
             return;
@@ -163,6 +160,14 @@ class MapManager {
 
     isTraversable(tile){
         if(this.tileObjs[tile[0]][tile[1]].traversable == 0){
+            return true;
+        }
+
+        return false;
+    }
+
+    isSameTile(tile1, tile2){
+        if(tile1[0] == tile2[0] && tile1[1] == tile2[1]){
             return true;
         }
 

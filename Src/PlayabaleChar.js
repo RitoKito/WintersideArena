@@ -21,14 +21,7 @@ class PlayableChar extends GameObject {
             90, 90
         )
     }
-
-    drawStats(uiCtx){
-        uiCtx.font = "25px Georgia";
-        uiCtx.fillText("HP: " + this.stats.currentHP + "/" + this.stats.maxHp, 110, 30);
-        uiCtx.fillText("OTHER STATS", 110, 60);
-        uiCtx.fillText("OTHER STATS", 110, 90);
-    }
-
+    
     performAction(actions){
         this.stats.currentActions -= actions;
     }
