@@ -1,8 +1,10 @@
 class TileSelector extends GameObject{
     constructor(config){
         super(config);
-        this.enabled = 0;
-        this.selectedObj = null;
+        this.enabled = false;
+        this.selectedUnit = null;
+        this.playerUnit = null;
+        this.aiUnit = null;
         // Currently selected tile position
         this.selectedTile = [];
         this.confirmationTile = [];
@@ -32,26 +34,36 @@ class TileSelector extends GameObject{
         this.y = -100;
     }
 
-    selectObj(obj, tile){
+    selectUnit(unit, tile){
         this.enabled = 1;
-        this.selectedObj = obj;
         this.selectedTile = tile
+        this.selectedUnit = unit;
+
+        if(unit.team == 0){
+            this.playerUnit = unit;
+        }
+        else{
+            this.aiUnit = unit;
+        }
     }
 
-    deselectObj(){
+    deselectUnit(){
         this.enabled = 0;
-        this.selectedObj = null;
+        this.selectedUnit = 0;
+        this.aiUnit = null;
     }
 
-    isEmpty(){
-        if(this.selectedObj == null) { return true; }
+    hasObject(){
+        if(this.selectedUnit == null) { return true; }
         return false;
     }
 
-    compare(obj){
-        if(this.selectedObj != obj && obj != null){
+    compareUnits(unit){
+        if(this.selectedUnit != unit && unit != null){
+            console.log("false");
             return false;
         }
+
         return true;
     }
 

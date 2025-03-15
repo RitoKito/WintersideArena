@@ -20,11 +20,11 @@ body {
     height: 100px;
 }
 
-.player-unit-portrait {
+.portrait {
     margin: 5px;
 }
 
-.player-unit-stats{
+.unit-stats{
     display: grid;
     grid-template-rows: 1fr 1fr 1fr;
     margin: 5px;

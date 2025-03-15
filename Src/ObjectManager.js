@@ -1,10 +1,11 @@
-function instPlayableUnit(name, stats, tile, mapManager, imgPath){
+function instPlayableUnit(team, name, stats, tile, mapManager, imgPath){
     if(mapManager.isOccupied(tile) || !mapManager.isTraversable(tile)){
         console.log("Failed to instantiate " + name + " at " + tile + "; Aborting");
         return;
     }
 
-    let character = new PlayableChar({
+    let character = new PlayableUnit({
+        team: team,
         name: name,
         maxHp: stats.maxHp,
         maxActions: stats.maxActions,

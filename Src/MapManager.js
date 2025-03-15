@@ -4,7 +4,7 @@ class MapManager {
         this.layout = config.layout;
         this.tileObjs = config.tileObjs;
         this.initTileObjs();
-        this.validTilesEnabled = 0;
+        this.showValidTiles = false;
         this.validTiles = new Set();
         // this.image = new Image();
         // this.image.src = "./img/SS1_Sketch.png"
@@ -133,6 +133,12 @@ class MapManager {
             tile.drawValid(ctx)
         })
         ctx.globalAlpha=1;
+    }
+
+    //TODO cache valid tiles
+    hideValidTiles(){
+        this.showValidTiles = false;
+        this.validTiles.clear();
     }
 
     freeTile(tile){

@@ -3,6 +3,8 @@ class GameObject{
         this.name = config.name;
         this.x = config.x;
         this.y = config.y;
+        this.renderX = this.x;
+        this.renderY = this.y;
         this.sprite = new Sprite({
             gameObject: this,
             src: config.src,

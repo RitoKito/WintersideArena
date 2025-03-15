@@ -1,4 +1,4 @@
-class CharStats {
+class UnitStats {
     constructor(config){
         // this.shield = config.shield;
         this.maxHp = config.maxHp;
