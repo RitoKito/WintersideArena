@@ -228,7 +228,7 @@ class Arena {
         this.map.freeTile(this.tileSelector.playerUnit.tile);
         this.map.occupyTile([x, y], this.tileSelector.playerUnit);
         
-        await this.tileSelector.playerUnit.animateMove(x*1100, y*100);
+        await this.tileSelector.playerUnit.animateMove(x*100, y*100);
 
         // Calculate movement distance
         let yDist = Math.abs(this.tileSelector.playerUnit.tile[0] - x);
@@ -343,6 +343,11 @@ class Arena {
                         this.cancelSelection();
                         playerRoundState = playerStates.NONE
                     }
+                }
+                else if(unit.isPlayerUnit() && unit != this.tileSelector.playerUnit){
+                    this.tileSelector.selectUnit(unit);
+                    this.calculateValidTiles(x, y, unit);
+                    playerRoundState = playerStates.SELECTED_UNIT;
                 }
                 else if(unit.isPlayerUnit() && unit == this.tileSelector.playerUnit){
                     this.cancelSelection();

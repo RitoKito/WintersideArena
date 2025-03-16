@@ -55,6 +55,7 @@ class PlayableUnit extends GameObject {
             }
             if(x == this.renderY
                 && y == this.renderX){
+                    console.log("cancel");
                     clearInterval(moveAnimation);
                 }
         }, 1);
