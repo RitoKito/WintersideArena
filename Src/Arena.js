@@ -41,7 +41,11 @@ class Arena {
             }
 
             // Render gameobjects, drawn last to be on top layer
-            Object.values(this.map.gameObjects).forEach(object => {
+            // Object.values(this.map.gameObjects).forEach(object => {
+            //     object.sprite.draw(this.ctx);
+            // })
+
+            Object.values(this.gameManager.gameObjects).forEach(object => {
                 object.sprite.draw(this.ctx);
             })
 
@@ -56,79 +60,54 @@ class Arena {
 
     init() {
         console.log("Arena init", this);
-        this.uiManager.showPlayerUI(true);
+
+        this.uiManager.showPlayerUI(false);
+
+        document.addEventListener("onDeath", function(event){
+            // this.tileSelector.aiUnit.die(); 
+            // this.tileSelector.aiUnit = null;
+            // this.selectedUnit = this.tileSelector.playerUnit;
+            // this.uiManager.showAiUI(false);
+        }.bind(this));
+
         this.canvas.addEventListener("click", function(event){ // TODO refactor into functions
 
             // Map screen coordinates to tiles
             // x and y are flipped to map array indices to intiuitive 2D axis
             let x = Math.trunc(event.offsetY/100);
             let y = Math.trunc(event.offsetX/100);
+            let unit = this.map.tileObjs[x][y].occupant;
 
-            // Select a tile occupied by playable character or switch to different character
-            if(this.tileSelector.hasObject() || !this.tileSelector.compareUnits(this.map.tileObjs[x][y].occupant)){
-                if(this.map.isOccupied([x, y])){
-                    this.selectUnit(x, y);
-                    // this.tileSelector.tileMove([x, y]);
-                    // this.tileSelector.enabled = 1;
-                    // this.tileSelector.selectObj(this.map.tileObjs[x][y].occupant, [x, y]);
+            // // Select a unit if none are selected or switch to different unit
+            // if(!this.tileSelector.hasUnit() || !this.tileSelector.compareUnits(this.map.tileObjs[x][y].occupant)){
+            //     this.selectUnit(x, y);
+            // }
+            // // If unit is selected
+            // else{
+            //     //If selected tile is free and clicked twice then move to that tile
+            //     if(this.tileSelector.confirmationTile[0] == x && this.tileSelector.confirmationTile[1] == y
+            //         && !this.map.isSameTile(this.tileSelector.confirmationTile, this.tileSelector.selectedUnit.tile)){
+            //         this.moveUnit(x, y);
+            //     }
+            //     // Select tile to move to and hightlight it
+            //     else if(this.map.isTraversable([x,y]) && !this.map.isOccupied([x,y]) && this.map.isValidTile(x, y)){
+            //         this.tileSelector.confirmationTile = [x, y];
+            //         this.tileSelector.tileMove([x, y]);
+            //     }
+            //     // Deselect tile
+            //     else{
+            //         this.tileSelector.deselectUnit();
+            //         this.tileSelector.disable()
+            //         this.map.hideValidTiles();
+            //         this.uiManager.showAiUI(false);
+            //     }
+            // }
 
-                    // let unit = this.tileSelector.selectedUnit;
-                    // this.calculateValidTiles(x, y, unit);
-                    // this.uiManager.updateUnitStats(unit);
-                }
+            this.handlePlayerRound(x, y, unit);
 
-            }
-            // When character selected for an action
-            // TODO move character to selected cell
-            else{
-                // If tile has been selected, clicking on it again will commit to action
-                if(this.tileSelector.confirmationTile[0] == x && this.tileSelector.confirmationTile[1] == y
-                    && !this.map.isSameTile(this.tileSelector.confirmationTile, this.tileSelector.selectedUnit.tile)
-                ){
-                    this.moveUnit(x, y);
-                    // if(this.map.isOccupied([x, y]) && !this.tileSelector.selectedUnit.isPlayerUnit()){
-                        // console.log("enemy unit");
-                    // }
-                    // else{
-                    // }
-                    // this.map.freeTile(this.tileSelector.selectedTile);
-                    // this.map.occupyTile([x, y], this.tileSelector.selectedUnit);
+            console.log(playerRoundState);
 
-                    // // Calculate movement distance
-                    // let yDist = Math.abs(this.tileSelector.selectedTile[0] - x);
-                    // let xDist = Math.abs(this.tileSelector.selectedTile[1] - y);
-                    // let totalTravelDist = xDist + yDist;
-                    // // Subtract 2 actions if moving double speed stat, otherwise subtract 1 action
-                    // if(totalTravelDist > this.tileSelector.selectedUnit.stats.moveLen){
-                    //     this.tileSelector.selectedUnit.performAction(2);
-                    // }
-                    // else{
-                    //     this.tileSelector.selectedUnit.performAction(1);
-                    // }
-
-                    // this.tileSelector.selectedTile = this.tileSelector.confirmationTile;
-                    // this.tileSelector.selectedUnit.tileMove([x,y]);
-                    // this.uiManager.updateUnitStats(this.tileSelector.selectedUnit);
-                    // this.calculateValidTiles(x, y, this.tileSelector.selectedUnit);
-
-                    // this.tileSelector.deselectObj();
-                    // this.tileSelector.enabled = 0;
-                    // this.map.validTilesEnabled = 0;
-                }
-                // Select tile to move to and hightlight it
-                else if(this.map.isTraversable([x,y]) && !this.map.isOccupied([x,y]) && this.map.isValidTile(x, y)){
-                    this.tileSelector.confirmationTile = [x, y];
-                    this.tileSelector.tileMove([x, y]);
-                }
-                // Deselect tile
-                else{
-                    // this.tileSelector.selectedUnit.animateMove(this.tileSelector.selectedUnit.y, this.tileSelector.selectedUnit.x);
-                    this.tileSelector.deselectUnit();
-                    this.tileSelector.disable()
-                    this.map.hideValidTiles();
-                    this.uiManager.showAiUI(false);
-                }
-            }
+1
 
         }.bind(this));
 
@@ -139,31 +118,67 @@ class Arena {
 
 
         // instantiate test character
-        instPlayableUnit(
+        let char0 = this.gameManager.instPlayableUnit(
             0,
             "char0", 
             {
                 maxHp: 12,
-                attack: 5,
                 moveLen: 3,
                 maxActions: 999,
+                weapon: new Weapon({
+                    weaponName: "Claymore",
+                    sprite: null,
+                    attack: 5,
+                    attackNumber: 3,
+                    distance: 4,
+                    hitChance: 65,
+                }),
             },
             [1,0], 
             this.map, 
             "img/Paladin_sketch_100.png");
 
-        instPlayableUnit(
+        let char2 = this.gameManager.instPlayableUnit(
+            0,
+            "char2", 
+            {
+                maxHp: 12,
+                moveLen: 3,
+                maxActions: 999,
+                weapon: new Weapon({
+                    weaponName: "Claymore",
+                    sprite: null,
+                    attack: 5,
+                    attackNumber: 3,
+                    distance: 4,
+                    hitChance: 65,
+                }),
+            },
+            [0,0], 
+            this.map, 
+            "img/Paladin_sketch_100.png");
+
+        let char1 =  this.gameManager.instPlayableUnit(
             1,
             "char1", 
             {
-                maxHp: 10,
-                attack: 5,
+                maxHp: 12,
+                weapon: new Weapon({
+                    weaponName: "Claymore",
+                    sprite: null,
+                    attack: 5,
+                    attackNumber: 3,
+                    distance: 4,
+                    hitChance: 0.5,
+                }),
                 moveLen: 3,
                 maxActions: 999,
             },
             [5,0], 
             this.map, 
             "img/Paladin_sketch_100.png");
+
+        // this.tileSelector.selectUnit(this.gameManager.playerUnits[0]);
     }
 
     calculateValidTiles(x, y, unit){
@@ -184,11 +199,10 @@ class Arena {
     }
 
     selectUnit(x, y){
-        this.tileSelector.tileMove([x, y]);
-        this.tileSelector.enabled = true;
-        // this.tileSelector.selectObj(this.map.tileObjs[x][y].occupant, [x, y]);
+        // this.tileSelector.tileMove([x, y]);
 
-        let unit = this.map.tileObjs[x][y].occupant;
+        this.tileSelector.selectedUnit = this.map.tileObjs[x][y].occupant;
+        let unit = this.tileSelector.selectedUnit;
 
         if(unit.isPlayerUnit()){
             this.uiManager.updatePlayerUI(unit);
@@ -196,33 +210,151 @@ class Arena {
         }
         else{
             this.uiManager.updateAiUI(unit);
-            this.uiManager.showAiUI(true);
+            this.uiManager.showAiUI(true, unit);
             this.map.hideValidTiles();
         }
 
-        this.tileSelector.selectUnit(unit, unit.tile);
+        this.tileSelector.selectUnit(this.tileSelector.selectedUnit, this.tileSelector.selectedUnit.tile);
     }
 
-    moveUnit(x, y){
-        this.map.freeTile(this.tileSelector.selectedTile);
-        this.map.occupyTile([x, y], this.tileSelector.selectedUnit);
-        this.tileSelector.selectedUnit.animateMove(x*100, y*100);
+    cancelSelection(){
+        this.tileSelector.deselectUnit();
+        this.tileSelector.disable()
+        this.map.hideValidTiles();
+        this.uiManager.showAiUI(false);
+    }
+
+    async moveUnit(x, y){
+        this.map.freeTile(this.tileSelector.playerUnit.tile);
+        this.map.occupyTile([x, y], this.tileSelector.playerUnit);
+        
+        await this.tileSelector.playerUnit.animateMove(x*1100, y*100);
 
         // Calculate movement distance
-        let yDist = Math.abs(this.tileSelector.selectedTile[0] - x);
-        let xDist = Math.abs(this.tileSelector.selectedTile[1] - y);
+        let yDist = Math.abs(this.tileSelector.playerUnit.tile[0] - x);
+        let xDist = Math.abs(this.tileSelector.playerUnit.tile[1] - y);
         let totalTravelDist = xDist + yDist;
         // Subtract 2 actions if moving double speed stat, otherwise subtract 1 action
-        if(totalTravelDist > this.tileSelector.selectedUnit.stats.moveLen){
-            this.tileSelector.selectedUnit.performAction(2);
+        if(totalTravelDist > this.tileSelector.playerUnit.stats.moveLen){
+            this.tileSelector.playerUnit.performAction(2);
         }
         else{
-            this.tileSelector.selectedUnit.performAction(1);
+            this.tileSelector.playerUnit.performAction(1);
         }
 
-        this.tileSelector.selectedTile = this.tileSelector.confirmationTile;
-        this.tileSelector.selectedUnit.tileMove([x,y]);
-        this.uiManager.updatePlayerUI(this.tileSelector.selectedUnit);
-        this.calculateValidTiles(x, y, this.tileSelector.selectedUnit);
+        this.tileSelector.playerUnit.tile = this.tileSelector.confirmationTile;
+        this.tileSelector.playerUnit.tileMove([x,y]);
+        this.uiManager.updatePlayerUI(this.tileSelector.playerUnit);
+        this.calculateValidTiles(x, y, this.tileSelector.playerUnit);
+    }
+
+    handlePlayerRound(x, y, unit){
+        switch(playerRoundState){
+            case playerStates.NONE:
+                if(unit != null){
+                    this.tileSelector.selectUnit(unit);
+                    if(unit.isPlayerUnit()){
+                        playerRoundState = playerStates.SELECTED_UNIT;
+                        this.calculateValidTiles(x, y, unit);
+                        this.uiManager.showPlayerUI(true, unit);
+                    }
+                    else{
+                        this.uiManager.showAiUI(true, unit);
+                    }
+                }
+                else{
+                    this.cancelSelection();
+                }
+                break;
+            case playerStates.SELECTED_UNIT:
+                if(unit != null){
+                    if(unit == this.tileSelector.selectedUnit){
+                        this.cancelSelection();
+                        playerRoundState = playerStates.NONE;
+                    }
+                    else{
+                        this.tileSelector.selectUnit(unit);
+                        if(unit.isPlayerUnit()){
+                            this.calculateValidTiles(x, y, unit);
+                        }
+                        else{
+                            // this.map.hideValidTiles();
+                            this.uiManager.showAiUI(true, unit);
+                            playerRoundState = playerStates.SELECTED_AI_UNIT;
+                        }
+                    }
+                }
+                else{
+                    if(this.map.isValidTile([x, y])){
+                        this.tileSelector.confirmationTile = [x, y];
+                        this.tileSelector.tileMove([x, y]);
+                        playerRoundState = playerStates.SELECTED_TILE;
+                    }
+                    else{
+                        this.cancelSelection();
+                        playerRoundState = playerStates.NONE;
+                    }
+                }
+                break;
+            case playerStates.SELECTED_TILE:
+                if(unit != null){
+                    // this.tileSelector.selectUnit(unit);
+                    // playerRoundState = playerStates.SELECTED_AI_UNIT;
+                    if(unit.isPlayerUnit()){
+                        if(unit == this.tileSelector.playerUnit){
+                            this.cancelSelection();
+                            playerRoundState = playerStates.NONE;
+                        }
+                        else{
+                            this.tileSelector.selectUnit(unit);
+                            this.calculateValidTiles(x, y, unit);
+                            playerRoundState = playerStates.SELECTED_UNIT;
+                        }
+                    }
+                    else{
+                        this.tileSelector.selectUnit(unit);
+                        // this.map.hideValidTiles();
+                        this.uiManager.showAiUI(true, unit);
+                        playerRoundState = playerStates.SELECTED_AI_UNIT;
+                    }
+                }
+                else if(isSameTile([x, y], this.tileSelector.confirmationTile)){
+                    this.moveUnit(x, y);
+                    console.log("move");
+                }
+                else if(this.map.isValidTile([x, y])){
+                    this.tileSelector.confirmationTile = [x, y];
+                    this.tileSelector.tileMove([x, y]);
+                }
+                else{
+                    this.cancelSelection();
+                    playerRoundState = playerStates.NONE;
+                }
+                break;
+            case playerStates.SELECTED_AI_UNIT:
+                console.log(unit);
+                if(unit == null){
+                    if(this.map.isValidTile([x, y])){
+                        this.tileSelector.confirmationTile = [x, y];
+                        this.tileSelector.tileMove([x, y]);
+                        playerRoundState = playerStates.SELECTED_TILE;
+                    }
+                    else{
+                        this.cancelSelection();
+                        playerRoundState = playerStates.NONE
+                    }
+                }
+                else if(unit.isPlayerUnit() && unit == this.tileSelector.playerUnit){
+                    this.cancelSelection();
+                    playerRoundState = playerStates.NONE;
+                }
+                else if(!unit.isPlayerUnit() && unit == this.tileSelector.aiUnit){
+                    console.log("Combat");
+                    this.cancelSelection();
+                    playerRoundState = playerStates.NONE
+                }
+
+                break;
+        }
     }
 }

@@ -119,8 +119,8 @@ class MapManager {
         this.getValidTiles(x, y - 1, moveLen - 1, this.validTiles);
     }
     
-    isValidTile(x, y){
-        if(this.validTiles.has(this.tileObjs[x][y])){
+    isValidTile(tile){
+        if(this.validTiles.has(this.tileObjs[tile[0]][tile[1]])){
             return true;
         }
 

@@ -8,17 +8,14 @@ class TileSelector extends GameObject{
         // Currently selected tile position
         this.selectedTile = [];
         this.confirmationTile = [];
+        this.confirmSelection= false;
         this.selectedImg = new Image();
         this.selectedImg.src = "./img/selected_tile.png";
+        this.state = 0;
     }
 
     //TODO give sprite
     draw(ctx){
-        // ctx.lineWidth = "4";
-        // ctx.strokeStyle = "#C41E3A";
-        // ctx.rect(this.x, this.y, 100, 100);
-        // ctx.stroke();
-
         ctx.globalAlpha=0.75;
         ctx.drawImage(this.selectedImg,
             0, 0,
@@ -34,9 +31,10 @@ class TileSelector extends GameObject{
         this.y = -100;
     }
 
-    selectUnit(unit, tile){
+    selectUnit(unit){
         this.enabled = 1;
-        this.selectedTile = tile
+        this.tileMove(unit.tile);
+        this.selectedTile = unit.tile;
         this.selectedUnit = unit;
 
         if(unit.team == 0){
@@ -49,21 +47,17 @@ class TileSelector extends GameObject{
 
     deselectUnit(){
         this.enabled = 0;
-        this.selectedUnit = 0;
+        this.selectedUnit = null;
         this.aiUnit = null;
     }
 
-    hasObject(){
-        if(this.selectedUnit == null) { return true; }
-        return false;
+    selectTile(tile){
+        this.selectTile = tile;
+        this.selectedUnit = null;
     }
 
-    compareUnits(unit){
-        if(this.selectedUnit != unit && unit != null){
-            console.log("false");
-            return false;
-        }
-
+    hasUnit(){
+        if(this.selectedUnit == null) { return false; }
         return true;
     }
 

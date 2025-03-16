@@ -35,8 +35,9 @@ class UIManager {
         }
     }
 
-    showPlayerUI(state){
+    showPlayerUI(state, unit){
         if(state == true){
+            this.updatePlayerUI(unit);
             this.togglePlayerIcon(true);
             this.togglePlayerUnitStats(true);
         }
@@ -46,11 +47,11 @@ class UIManager {
         }
     }
 
-    updatePlayerUI(char){
-        this.playerUnitHP.textContent="HP: " + char.stats.currentHp + "/" + char.stats.maxHp;
-        this.playerUnitAttack.textContent="Attack: " + char.stats.attack;
-        this.playerUnitSpeed.textContent="Speed: " + char.stats.moveLen;
-        this.playerUnitActions.textContent="Actions: " + char.stats.currentActions + "/" + char.stats.maxActions;
+    updatePlayerUI(unit){
+        this.playerUnitHP.textContent="HP: " + unit.stats.currentHp + "/" + unit.stats.maxHp;
+        this.playerUnitAttack.textContent="Attack: " + unit.weapon.attack + "x" + unit.weapon.attackNumber;
+        this.playerUnitSpeed.textContent="Speed: " + unit.stats.moveLen;
+        this.playerUnitActions.textContent="Actions: " + unit.stats.currentActions + "/" + unit.stats.maxActions;
     }
 
     toggleAiIcon(state, unit){
@@ -72,8 +73,9 @@ class UIManager {
         }
     }
 
-    showAiUI(state){
+    showAiUI(state, unit){
         if(state == true){
+            this.updateAiUI(unit);
             this.toggleAiIcon(true);
             this.toggleAiUnitStats(true);
         }
@@ -85,7 +87,7 @@ class UIManager {
 
     updateAiUI(unit){
         this.aiUnitHP.textContent="HP: " + unit.stats.currentHp + "/" + unit.stats.maxHp;
-        this.aiUnitAttack.textContent="Attack: " + unit.stats.attack;
+        this.aiUnitAttack.textContent="Attack: " + unit.weapon.attack + "x" + unit.weapon.attackNumber;
         this.aiUnitSpeed.textContent="Speed: " + unit.stats.moveLen;
         this.aiUnitActions.textContent="Actions: " + unit.stats.currentActions + "/" + unit.stats.maxActions;
     }

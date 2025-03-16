@@ -5,15 +5,14 @@ class PlayableUnit extends GameObject {
         this.tile = config.tile;
         this.stats = new UnitStats({
             maxHp: config.maxHp,
-            attack: config.attack,
             moveLen: config.moveLen,
             maxActions: config.maxActions
         });
+        this.weapon = config.weapon;
         this.portrait = new Image();
         this.portrait.src = "./img/portrait_placeholder.png";
-        this.team = config.team;
-        this.animationQueue = new Set();
     }
+
 
     drawPortrait(uiCtx){
         uiCtx.drawImage(this.portrait,
@@ -59,7 +58,28 @@ class PlayableUnit extends GameObject {
                     clearInterval(moveAnimation);
                 }
         }, 1);
+    }
 
-        this.animationQueue.add(moveAnimation);
+    takeDamage(damage){
+        this.stats.currentHp -= damage;
+
+        if(this.stats.currentHp <= 0){
+            emitEvent(this.name, "onDeath");
+        }
+    }
+
+    dealDamage(unit){
+        let successfulAttacks = 0;
+        let min = Math.ceil(0);
+        let max = Math.floor(this.weapon.hitChance);
+        for(let i = this.weapon.attackNumber; i > 0; i--){
+            let chance =  Math.floor(Math.random() * (max - min + 1) + min);
+            console.log(chance);
+            if(chance){
+                successfulAttacks++;
+            }
+        }
+
+        unit.takeDamage(this.weapon.attack * successfulAttacks);
     }
 }
