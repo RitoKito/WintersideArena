@@ -320,7 +320,7 @@ class Arena {
                 }
                 else if(isSameTile([x, y], this.tileSelector.confirmationTile)){
                     this.moveUnit(x, y);
-                    console.log("move");
+                    // console.log("move");
                 }
                 else if(this.map.isValidTile([x, y])){
                     this.tileSelector.confirmationTile = [x, y];
@@ -332,7 +332,7 @@ class Arena {
                 }
                 break;
             case playerStates.SELECTED_AI_UNIT:
-                console.log(unit);
+                // console.log(unit);
                 if(unit == null){
                     if(this.map.isValidTile([x, y])){
                         this.tileSelector.confirmationTile = [x, y];
