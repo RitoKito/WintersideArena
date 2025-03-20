@@ -11,7 +11,7 @@ class GameManager {
     }
 
     instPlayableUnit(team, name, stats, tile, mapManager, imgPath){
-        if(mapManager.isOccupied(tile) || !mapManager.isTraversable(tile)){
+        if(isOccupied(mapManager, tile) || !isTraversable(mapManager, tile)){
             console.log("Failed to instantiate " + name + " at " + tile + "; Aborting");
             return;
         }

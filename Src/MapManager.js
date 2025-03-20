@@ -5,7 +5,11 @@ class MapManager {
         this.tileObjs = config.tileObjs;
         this.initTileObjs();
         this.showValidTiles = false;
+        this.showValidPath = false;
         this.validTiles = new Set();
+        this.pathList = [];
+
+        
         // this.image = new Image();
         // this.image.src = "./img/SS1_Sketch.png"
         
@@ -61,8 +65,8 @@ class MapManager {
 
                 this.tileObjs[i][j] = new Tile({
                     name: "tile_"+i+"_"+j,
-                    x: j*100,
                     y: i*100,
+                    x: j*100,
                     tilePos: [i,j],
                     traversable: traversable,
                     occupied: 0,
@@ -100,8 +104,8 @@ class MapManager {
 
     //Recursive function to calculate possible tiles for movement
     //Based on char moveLen stat
-    getValidTiles(x, y , moveLen){
-        if(x < 0 || y < 0 || x >= this.tileObjs[0].length || y >= this.tileObjs.length) {
+    getValidTiles(y, x , moveLen){
+        if(y < 0 || x < 0 || x >= this.tileObjs[0].length || y >= this.tileObjs.length) {
              return; 
         }
 
@@ -113,18 +117,111 @@ class MapManager {
 
         this.validTiles.add(this.tileObjs[y][x]);
 
-        this.getValidTiles(x + 1, y, moveLen - 1, this.validTiles);
-        this.getValidTiles(x - 1, y, moveLen - 1, this.validTiles);
-        this.getValidTiles(x, y + 1, moveLen - 1, this.validTiles);
-        this.getValidTiles(x, y - 1, moveLen - 1, this.validTiles);
+        this.getValidTiles(y + 1, x, moveLen - 1, this.validTiles);
+        this.getValidTiles(y - 1, x, moveLen - 1, this.validTiles);
+        this.getValidTiles(y, x + 1, moveLen - 1, this.validTiles);
+        this.getValidTiles(y, x - 1, moveLen - 1, this.validTiles);
     }
-    
-    isValidTile(tile){
-        if(this.validTiles.has(this.tileObjs[tile[0]][tile[1]])){
-            return true;
+
+    findValidPath(y1, x1, y2, x2){
+        let origin = this.tileObjs[y1][x1];
+        let destination = this.tileObjs[y2][x2];
+        let i = 0;
+        let processed = new Set();
+        let unprocessed = new Set();
+
+        let current = origin;
+        current.parent = null;
+        unprocessed.add(current);
+
+
+        while(unprocessed.size > 0){
+            if(current == destination){
+                console.log("found destinatuion")
+                break;
+            }
+
+            let up = null;
+            let down = null;
+            let left = null;
+            let right = null;
+
+            current.getFCost(origin, destination)
+
+            if(isInBounds(this, [y1 - 1, x1])){
+                up = this.tileObjs[y1 - 1][x1];
+                if(isValidTile(this, up.tilePos) && !processed.has(up) && !unprocessed.has(up)){
+                    up.getFCost(origin, destination);
+                    up.parent = current;
+                    unprocessed.add(up);
+                }
+            }
+
+            if(isInBounds(this, [y1 + 1, x1])){
+                down = this.tileObjs[y1 + 1][x1];
+
+                if(isValidTile(this, down.tilePos) && !processed.has(down) && !unprocessed.has(down)){
+                    down.getFCost(origin, destination);
+                    down.parent = current;
+                    unprocessed.add(down);
+                }
+            }
+
+            if(isInBounds(this, [y1, x1 - 1])){
+                left = this.tileObjs[y1][x1 - 1];
+                if(isValidTile(this, left.tilePos) && !processed.has(left) && !unprocessed.has(left)){
+                    left.getFCost(origin, destination);
+                    left.parent = current;
+                    unprocessed.add(left);
+                }
+            }
+
+            if(isInBounds(this, [y1, x1 + 1])){
+                right = this.tileObjs[y1][x1 + 1];
+                if(isValidTile(this, right.tilePos) && !processed.has(right) && !unprocessed.has(right)){
+                    right.getFCost(origin, destination);
+                    right.parent = current;
+                    unprocessed.add(right);
+                }
+            }
+
+            processed.add(current);
+            unprocessed.delete(current);
+
+            let bestSuccessor = unprocessed.values().next().value;;
+            unprocessed.forEach(tile => {
+                if(tile.fCost < bestSuccessor.fCost || 
+                tile.fCost == bestSuccessor.fCost && tile.hCost <= bestSuccessor.hCost)
+                {
+                    bestSuccessor = tile;
+                }
+            })
+
+            current = bestSuccessor;
+            y1 = current.tilePos[0];
+            x1 = current.tilePos[1];
+            i++;
         }
 
-        return false;
+        // console.log(processed)
+        // let tile = Array.from(processed).pop();
+        // while(tile != null){
+        //     console.log(tile);
+        //     tile = tile.parent;
+        // }
+    }
+
+    // retracePath(closedList){
+    //     if()
+    // }
+
+    drawValidPath(ctx){
+        ctx.globalAlpha=0.75;
+        this.pathList[0].forEach(tile => {
+            // console.log(this.pathList[0])
+            tile.drawValid(ctx)
+        })
+        ctx.globalAlpha=1;
     }
 
     drawValidTiles(ctx){
@@ -147,37 +244,13 @@ class MapManager {
     }
     
     occupyTile(tile, obj){
-        if(this.isOccupied(tile)){
+        if(isOccupied(this, tile)){
             console.log("Error: tile at " + tile + " already occupied");
             return;
         }
 
         this.tileObjs[tile[0]][tile[1]].occupant = obj;
         this.tileObjs[tile[0]][tile[1]].occupied = 1;
-    }
-
-    isOccupied(tile){
-        if(this.tileObjs[tile[0]][tile[1]].occupied == 1){
-            return true;
-        }
-
-        return false;
-    }
-
-    isTraversable(tile){
-        if(this.tileObjs[tile[0]][tile[1]].traversable == 0){
-            return true;
-        }
-
-        return false;
-    }
-
-    isSameTile(tile1, tile2){
-        if(tile1[0] == tile2[0] && tile1[1] == tile2[1]){
-            return true;
-        }
-
-        return false;
     }
 }
 
