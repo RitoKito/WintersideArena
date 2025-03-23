@@ -4,14 +4,8 @@ class Arena {
 
         this.canvas = this.element.querySelector(".game-canvas");
         this.ctx = this.canvas.getContext("2d");
-        this.uiManager = new UIManager(this.element);
-        this.gameManager = new GameManager({})
 
-        // this.port = this.element.querySelector(".player-unit-portrait");
-        // this.stats = this.element.querySelector(".player-unit-stats");
-
-        // this.uiCanvas = this.element.querySelector(".ui-canvas");
-        // this.uiCtx = this.uiCanvas.getContext("2d");
+       
 
         this.map = null;
         this.tileSelector = null;
@@ -63,6 +57,17 @@ class Arena {
 
     init() {
         console.log("Arena init", this);
+                // Initialize map
+        this.uiManager = new UIManager(this.element);
+
+        this.map = new MapManager(window.MapList.Demo);
+        this.tileSelector = new TileSelector({x: 0, y: 0});
+
+        this.gameManager = new GameManager({
+            map: this.map,
+            uiManager: this.uiManager,
+            tileSelector: this.tileSelector,
+        })
 
         this.uiManager.showPlayerUI(false);
 
@@ -79,20 +84,16 @@ class Arena {
             // x and y are flipped to map array indices to intiuitive 2D axis
             let y = Math.trunc(event.offsetY/100);
             let x = Math.trunc(event.offsetX/100);
-            let unit = this.map.tileObjs[y][x].occupant;
+            // let unit = this.map.tileObjs[y][x].occupant;
 
-            this.handlePlayerRound(y, x, unit);
+            this.handlePlayerRound(y, x);
 
             // console.log(playerRoundState);
 
         }.bind(this));
 
-        // Initialize map
-        this.map = new MapManager(window.MapList.Demo);
-        this.tileSelector = new TileSelector({x: 0, y: 0});
         this.startGameLoop();
-
-
+        
         // instantiate test character
         let char0 = this.gameManager.instPlayableUnit(
             0,
@@ -154,116 +155,21 @@ class Arena {
             this.map, 
             "img/Paladin_sketch_100.png");
 
-        // this.tileSelector.selectUnit(this.gameManager.playerUnits[0]);
     }
 
-    calculateValidTiles(y, x, unit){
-        this.map.showValidTiles = true;
-
-        // Clamp max action to 2 to avoid overload during testing
-        let maxAction = 0;
-        if(unit.stats.currentActions >= 2) { maxAction = 2; }
-        else{ maxAction = unit.stats.currentActions; }
-
-        let moveLen = unit.stats.moveLen * maxAction;
-        this.map.validTiles.clear();
-        this.map.validTiles.add(this.map.tileObjs[y][x]);
-        this.map.getValidTiles(unit.tile[0] + 1, unit.tile[1], moveLen);
-        this.map.getValidTiles(unit.tile[0] - 1, unit.tile[1], moveLen);
-        this.map.getValidTiles(unit.tile[0], unit.tile[1] + 1, moveLen);
-        this.map.getValidTiles(unit.tile[0], unit.tile[1] - 1, moveLen);
-    }
-
-    selectUnit(y, x){
-        // this.tileSelector.tileMove([x, y]);
-
-        this.tileSelector.selectedUnit = this.map.tileObjs[x][y].occupant;
-        let unit = this.tileSelector.selectedUnit;
-
-        if(unit.isPlayerUnit()){
-            this.uiManager.updatePlayerUI(unit);
-            this.calculateValidTiles(y, x, unit);
-        }
-        else{
-            this.uiManager.updateAiUI(unit);
-            this.uiManager.showAiUI(true, unit);
-            this.map.hideValidTiles();
-        }
-
-        this.tileSelector.selectUnit(this.tileSelector.selectedUnit, this.tileSelector.selectedUnit.tile);
-    }
-
-    cancelSelection(){
-        this.tileSelector.deselectUnit();
-        this.tileSelector.disable()
-        this.map.hideValidTiles();
-        this.uiManager.showAiUI(false);
-    }
-
-    async moveUnit(y, x){
-        this.map.freeTile(this.tileSelector.playerUnit.tile);
-        this.map.occupyTile([y, x], this.tileSelector.playerUnit);
-        
-        await this.tileSelector.playerUnit.animateMove(y*100, x*100);
-
-        // Calculate movement distance
-        let yDist = Math.abs(this.tileSelector.playerUnit.tile[0] - y);
-        let xDist = Math.abs(this.tileSelector.playerUnit.tile[1] - x);
-        let totalTravelDist = xDist + yDist;
-        // Subtract 2 actions if moving double speed stat, otherwise subtract 1 action
-        if(totalTravelDist > this.tileSelector.playerUnit.stats.moveLen){
-            this.tileSelector.playerUnit.performAction(2);
-        }
-        else{
-            this.tileSelector.playerUnit.performAction(1);
-        }
-
-        this.tileSelector.playerUnit.tile = this.tileSelector.confirmationTile;
-        this.tileSelector.playerUnit.tileMove([y, x]);
-        this.uiManager.updatePlayerUI(this.tileSelector.playerUnit);
-        this.calculateValidTiles(y, x, this.tileSelector.playerUnit);
-    }
-
-    handlePlayerRound(y, x, unit){
+    handlePlayerRound(y, x){
         switch(playerRoundState){
             case playerStates.NONE:
-                handleNoneSelectedState(y, x, this, unit, this.tileSelector, this.uiManager);
+                handleNoneSelectedState(y, x, this.gameManager);
                 break;
-
             case playerStates.SELECTED_UNIT:
-                handlePlayerUnitSelectedState(y, x, this.map, this, unit, this.tileSelector, this.uiManager);
+                handlePlayerUnitSelectedState(y, x, this.gameManager);
                 break;
             case playerStates.SELECTED_TILE:
-                handleGridTileSelectedState(y, x, unit, this.map, this, this.tileSelector, this.uiManager)
+                handleGridTileSelectedState(y, x, this.gameManager)
                 break;
             case playerStates.SELECTED_AI_UNIT:
-                // console.log(unit);
-                // if(unit == null){
-                //     if(isValidTile(this.map, [y, x])){
-                //         this.tileSelector.confirmationTile = [y, x];
-                //         this.tileSelector.tileMove([y, x]);
-                //         playerRoundState = playerStates.SELECTED_TILE;
-                //     }
-                //     else{
-                //         this.cancelSelection();
-                //         playerRoundState = playerStates.NONE
-                //     }
-                // }
-                // else if(unit.isPlayerUnit() && unit != this.tileSelector.playerUnit){
-                //     this.tileSelector.selectUnit(unit);
-                //     this.calculateValidTiles(y, x, unit);
-                //     playerRoundState = playerStates.SELECTED_UNIT;
-                // }
-                // else if(unit.isPlayerUnit() && unit == this.tileSelector.playerUnit){
-                //     this.cancelSelection();
-                //     playerRoundState = playerStates.NONE;
-                // }
-                // else if(!unit.isPlayerUnit() && unit == this.tileSelector.aiUnit){
-                //     console.log("Combat");
-                //     this.cancelSelection();
-                //     playerRoundState = playerStates.NONE
-                // }
-                handleAIUnitSelectedState(y, x, unit, this.map, this, this.tileSelector, this.uiManager)
+                handleAIUnitSelectedState(y, x, this.gameManager)
                 break;
         }
     }

@@ -123,6 +123,24 @@ class MapManager {
         this.getValidTiles(y, x - 1, moveLen - 1, this.validTiles);
     }
 
+    calculateValidTiles(y, x){
+        this.showValidTiles = true;
+        let unit = this.tileObjs[y][x].occupant;
+
+        // Clamp max action to 2 to avoid overload during testing
+        let maxAction = 0;
+        if(unit.stats.currentActions >= 2) { maxAction = 2; }
+        else{ maxAction = unit.stats.currentActions; }
+
+        let moveLen = unit.stats.moveLen * maxAction;
+        this.validTiles.clear();
+        this.validTiles.add(this.tileObjs[y][x]);
+        this.getValidTiles(unit.tile[0] + 1, unit.tile[1], moveLen);
+        this.getValidTiles(unit.tile[0] - 1, unit.tile[1], moveLen);
+        this.getValidTiles(unit.tile[0], unit.tile[1] + 1, moveLen);
+        this.getValidTiles(unit.tile[0], unit.tile[1] - 1, moveLen);
+    }
+
     findValidPath(y1, x1, y2, x2){
         let origin = this.tileObjs[y1][x1];
         let destination = this.tileObjs[y2][x2];

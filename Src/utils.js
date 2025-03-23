@@ -41,9 +41,7 @@ function isInBounds(map, tile){
 
 function isValidTile(map, tile){
     let tileObj = map.tileObjs[tile[0]][tile[1]];
-    if(map.validTiles.has(tileObj) && isTraversable(map, tile)
-    && isInBounds(map, tile)
-    && !this.isOccupied(map, tile)){
+    if(map.validTiles.has(tileObj)){
         return true;
     }
 
