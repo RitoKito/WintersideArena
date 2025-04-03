@@ -2,16 +2,30 @@ class GameManager {
     constructor(config){
         this.tileSelector = config.tileSelector;
 
+        // Turn counter
         this.turn = 0;
-        this.activeTeam = config.activeTeam;
+        // Phase 0 -> Player Phase; Phase 1 -> AI Phase
+        this.phase = 0;
+        // this.activeTeam = config.activeTeam;
 
         this.map = config.map;
         this.uiManager = config.uiManager;
         this.tileSelector = config.tileSelector;
 
+        // Array of all game objects
         this.gameObjects = [];
+
+        // Array of player units
         this.playerUnits = [];
+        // Array of eliminated player units
+        this.elimPlayerUnits = [];
+
+        // Array of ai units
         this.aiUnits = [];
+        // Array of elimited ai units
+        this.elimAiUnits = [];
+
+        this.playerControlAllowed = true;
     }
 
     instPlayableUnit(team, name, stats, tile, mapManager, imgPath){
@@ -68,19 +82,26 @@ class GameManager {
         this.tileSelector.selectUnit(this.tileSelector.selectedUnit, this.tileSelector.selectedUnit.tile);
     }
 
-    cancelSelection(){
-        this.tileSelector.deselectUnit();
-        this.tileSelector.disable()
+    cancelSelection(_callback){
+        // this.playerControlAllowed = false;
+
         this.map.hideValidTiles();
         this.uiManager.showAiUI(false);
+        this.tileSelector.deselectUnit();
+        this.tileSelector.disable();
+
+        // _callback to prevents state change before the animation is completed
+        this.tileSelector.playerUnit.animateRevertToOrigin(function() {
+            if(_callback){
+                _callback();
+            }
+        });
     }
 
-    async moveUnit(y, x){
+    moveUnit(y, x){
         this.map.freeTile(this.tileSelector.playerUnit.tile);
         this.map.occupyTile([y, x], this.tileSelector.playerUnit);
         
-        await this.tileSelector.playerUnit.animateMove(y*100, x*100);
-
         // Calculate movement distance
         let yDist = Math.abs(this.tileSelector.playerUnit.tile[0] - y);
         let xDist = Math.abs(this.tileSelector.playerUnit.tile[1] - x);

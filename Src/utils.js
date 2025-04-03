@@ -1,4 +1,3 @@
-
 function compareUnits(u1, u2){
     if(u1 != u2){
         return false;

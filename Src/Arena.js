@@ -71,22 +71,24 @@ class Arena {
 
         this.uiManager.showPlayerUI(false);
 
+        // Handle unit death
         document.addEventListener("onDeath", function(event){
-            // this.tileSelector.aiUnit.die(); 
-            // this.tileSelector.aiUnit = null;
-            // this.selectedUnit = this.tileSelector.playerUnit;
-            // this.uiManager.showAiUI(false);
+           event.detail.object.unitDeath();
         }.bind(this));
 
         this.canvas.addEventListener("click", function(event){ // TODO refactor into functions
 
             // Map screen coordinates to tiles
-            // x and y are flipped to map array indices to intiuitive 2D axis
             let y = Math.trunc(event.offsetY/100);
             let x = Math.trunc(event.offsetX/100);
             // let unit = this.map.tileObjs[y][x].occupant;
 
-            this.handlePlayerRound(y, x);
+            if(this.gameManager.phase == 0 && this.gameManager.playerControlAllowed){
+                this.handlePlayerRound(y, x);
+            }
+            else{
+                // this.handleAIRound(y, x);
+            }
 
             // console.log(playerRoundState);
 
@@ -101,7 +103,7 @@ class Arena {
             {
                 maxHp: 12,
                 moveLen: 3,
-                maxActions: 999,
+                maxActions: 1,
                 weapon: new Weapon({
                     weaponName: "Claymore",
                     sprite: null,
@@ -121,7 +123,7 @@ class Arena {
             {
                 maxHp: 12,
                 moveLen: 3,
-                maxActions: 999,
+                maxActions: 1,
                 weapon: new Weapon({
                     weaponName: "Claymore",
                     sprite: null,
@@ -149,7 +151,7 @@ class Arena {
                     hitChance: 0.5,
                 }),
                 moveLen: 3,
-                maxActions: 999,
+                maxActions: 1,
             },
             [5,0], 
             this.map, 
@@ -158,6 +160,7 @@ class Arena {
     }
 
     handlePlayerRound(y, x){
+
         switch(playerRoundState){
             case playerStates.NONE:
                 handleNoneSelectedState(y, x, this.gameManager);

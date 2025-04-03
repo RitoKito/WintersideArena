@@ -7,7 +7,7 @@ class MapManager {
         this.showValidTiles = false;
         this.showValidPath = false;
         this.validTiles = new Set();
-        this.pathList = [];
+        this.aStarPath = [];
 
         
         // this.image = new Image();
@@ -141,7 +141,12 @@ class MapManager {
         this.getValidTiles(unit.tile[0], unit.tile[1] - 1, moveLen);
     }
 
+    // A* Pathfinding
     findValidPath(y1, x1, y2, x2){
+        // Round origin coordinates in case the player changes destination while animation is unfinished
+        // in which case the origin tile is estimated based on location of unit's sprite
+        y1 = Math.round(y1);
+        x1 = Math.round(x1);
         let origin = this.tileObjs[y1][x1];
         let destination = this.tileObjs[y2][x2];
         let i = 0;
@@ -155,7 +160,7 @@ class MapManager {
 
         while(unprocessed.size > 0){
             if(current == destination){
-                console.log("found destinatuion")
+                console.log("found destination")
                 break;
             }
 
@@ -221,12 +226,17 @@ class MapManager {
             i++;
         }
 
+        // this.aStarPath = Array.from(processed);
+        // console.log(Array.from(processed))
+
         // console.log(processed)
-        // let tile = Array.from(processed).pop();
-        // while(tile != null){
-        //     console.log(tile);
-        //     tile = tile.parent;
-        // }
+        this.aStarPath = [];
+        let tile = Array.from(processed).pop();
+        while(tile != null){
+            this.aStarPath.unshift(tile);
+            tile = tile.parent;
+        }
+        this.aStarPath.push(this.tileObjs[y2][x2]);
     }
 
     // retracePath(closedList){

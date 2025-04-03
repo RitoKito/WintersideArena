@@ -10,14 +10,15 @@
     <div class="game-container">
         <!-- <canvas class="ui-canvas" width="600" height="100"></canvas> -->
          <div class="ui-canvas">
-            <img class="player-unit-portrait portrait" width="90" height="90"/>
+            
+            <img class="player-unit-portrait portrait"/>
             <div class="player-unit-stats unit-stats">
                 <div class="unit-stat player-unit-hp"></div>
                 <div class="unit-stat player-unit-attack"></div>
                 <div class="unit-stat player-unit-speed"></div>
                 <div class="unit-stat player-unit-actions"></div>
             </div>
-            <img class="ai-unit-portrait portrait" width="90" height="90"/>
+            <img class="ai-unit-portrait portrait"/>
             <div class="ai-unit-stats unit-stats">
                 <div class="unit-stat ai-unit-hp"></div>
                 <div class="unit-stat ai-unit-attack"></div>
@@ -25,7 +26,15 @@
                 <div class="unit-stat ai-unit-actions"></div>
             </div>
          </div>
-        <canvas class="game-canvas" width="600"  height="900"></canvas>
+
+        <canvas class="game-canvas" width="600"  height="800"></canvas>
+        <div class="ui-canvas-phase">
+            <p1>Phase 0</p1>
+            <div class="menus">
+                <button class="menu-button">End Turn</button>
+                <button class="menu-button">Menu</button>
+            </div>
+        </div>
     </div>
 
     <!-- Scripts -->
