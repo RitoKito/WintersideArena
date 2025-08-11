@@ -1,2 +1,2 @@
 # WintersideArena
-Turn Based Video Game
+Attempt at JavaScript Game Engine
